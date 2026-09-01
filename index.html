@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Groove — Music Player</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&family=Inter:wght@400;500;600&display=swap');
+
+  :root{
+    --bg: #17130f;
+    --panel: #221b15;
+    --record: #0d0a08;
+    --groove-line: #2c231b;
+    --amber: #e8a341;
+    --amber-dim: #a97a3a;
+    --cream: #f3ead9;
+    --muted: #9a8b78;
+    --bar-track: #3a2f24;
+  }
+
+  *{ box-sizing: border-box; }
+
+  body{
+    margin:0;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:
+      radial-gradient(circle at 20% 15%, #221c15 0%, transparent 45%),
+      var(--bg);
+    font-family:'Inter', sans-serif;
+    color:var(--cream);
+    padding:24px;
+  }
+
+  .player{
+    width: 360px;
+    background: var(--panel);
+    border-radius: 22px;
+    padding: 28px 26px 24px;
+    box-shadow: 0 30px 60px -20px rgba(0,0,0,0.6);
+    border: 1px solid #33291f;
+  }
+
+  .app-name{
+    font-family:'Fraunces', serif;
+    font-size: 15px;
+    letter-spacing: 0.3px;
+    color: var(--muted);
+    margin: 0 0 20px;
+  }
+
+  .stage{
+    position:relative;
+    width:100%;
+    aspect-ratio: 1/1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin-bottom: 22px;
+  }
+
+  .record{
+    width: 74%;
+    height: 74%;
+    border-radius:50%;
+    background:
+      repeating-radial-gradient(circle at center, var(--groove-line) 0 2px, var(--record) 2px 6px);
+    box-shadow: 0 18px 40px -12px rgba(0,0,0,0.7), inset 0 0 0 1px #000;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    animation: spin 9s linear infinite;
+    animation-play-state: paused;
+  }
+
+  .record.spinning{ animation-play-state: running; }
+
+  .record::after{
+    content:"";
+    position:absolute;
+    width: 30%;
+    height: 30%;
+    border-radius:50%;
+    background: var(--amber);
+    box-shadow: inset 0 0 0 6px var(--record);
+  }
+
+  .art{
+    position:absolute;
+    width: 46%;
+    height: 46%;
+    border-radius:50%;
+    object-fit:cover;
+    z-index:2;
+    box-shadow: 0 0 0 3px var(--record);
+  }
+
+  @keyframes spin{ to{ transform: rotate(360deg); } }
+
+  .track-title{
+    font-family:'Fraunces', serif;
+    font-size: 22px;
+    font-weight:600;
+    text-align:center;
+    margin: 0 0 4px;
+  }
+
+  .track-artist{
+    text-align:center;
+    color: var(--muted);
+    font-size: 13.5px;
+    margin: 0 0 20px;
+  }
+
+  .progress-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom: 18px;
+  }
+
+  .time{
+    font-size: 11.5px;
+    color: var(--muted);
+    width: 34px;
+    font-variant-numeric: tabular-nums;
+  }
+  .time.end{ text-align:right; }
+
+  input[type="range"]{
+    -webkit-appearance:none;
+    appearance:none;
+    flex:1;
+    height: 4px;
+    border-radius: 4px;
+    background: var(--bar-track);
+    cursor:pointer;
+  }
+
+  input[type="range"]#progress{
+    background: linear-gradient(to right, var(--amber) 0%, var(--amber) 0%, var(--bar-track) 0%);
+  }
+
+  input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    width:13px; height:13px;
+    border-radius:50%;
+    background: var(--cream);
+    box-shadow: 0 0 0 3px rgba(232,163,65,0.25);
+    margin-top: -1px;
+  }
+  input[type="range"]::-moz-range-thumb{
+    width:13px; height:13px; border:none; border-radius:50%;
+    background: var(--cream);
+  }
+
+  .controls{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap: 22px;
+    margin-bottom: 20px;
+  }
+
+  .controls button{
+    background:none;
+    border:none;
+    color: var(--cream);
+    cursor:pointer;
+    padding:6px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition: transform 0.15s ease, color 0.15s ease;
+  }
+  .controls button:hover{ color: var(--amber); transform: scale(1.08); }
+  .controls button:active{ transform: scale(0.94); }
+
+  #playBtn{
+    width:54px; height:54px;
+    border-radius:50%;
+    background: var(--amber);
+    color: var(--record);
+  }
+  #playBtn:hover{ color: var(--record); background: var(--cream); }
+
+  .skip svg{ width:20px; height:20px; }
+  #playBtn svg{ width:20px; height:20px; }
+
+  .lower-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap: 14px;
+  }
+
+  .volume{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex:1;
+  }
+  .volume svg{ width:16px; height:16px; color: var(--muted); flex-shrink:0; }
+  .volume input{ width: 80px; }
+
+  .icon-toggle{
+    background:none;
+    border: 1px solid var(--bar-track);
+    color: var(--muted);
+    border-radius: 20px;
+    padding: 6px 12px;
+    font-size: 11.5px;
+    cursor:pointer;
+    letter-spacing:0.2px;
+    transition: all 0.15s ease;
+  }
+  .icon-toggle.active{
+    color: var(--record);
+    background: var(--amber);
+    border-color: var(--amber);
+  }
+
+  .playlist{
+    margin-top: 20px;
+    border-top: 1px solid var(--bar-track);
+    padding-top: 14px;
+    max-height: 168px;
+    overflow-y:auto;
+  }
+
+  .playlist::-webkit-scrollbar{ width:5px; }
+  .playlist::-webkit-scrollbar-thumb{ background: var(--bar-track); border-radius:4px; }
+
+  .song{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding: 9px 6px;
+    border-radius: 10px;
+    cursor:pointer;
+    font-size: 13px;
+  }
+  .song:hover{ background: #2b2219; }
+  .song.active{ background: #2f2416; color: var(--amber); }
+
+  .song-info{ display:flex; flex-direction:column; gap:2px; }
+  .song-name{ font-weight:500; }
+  .song-sub{ font-size:11px; color: var(--muted); }
+  .song.active .song-sub{ color: var(--amber-dim); }
+  .song-len{ font-size:11.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+
+<div class="player">
+  <p class="app-name">Groove</p>
+
+  <div class="stage">
+    <div class="record" id="record">
+      <img class="art" id="art" src="" alt="">
+    </div>
+  </div>
+
+  <h2 class="track-title" id="trackTitle">—</h2>
+  <p class="track-artist" id="trackArtist">—</p>
+
+  <div class="progress-row">
+    <span class="time" id="currentTime">0:00</span>
+    <input type="range" id="progress" value="0" min="0" max="100" step="0.1">
+    <span class="time end" id="duration">0:00</span>
+  </div>
+
+  <div class="controls">
+    <button id="prevBtn" title="Previous" class="skip">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zM10 12l9-6v12z"/></svg>
+    </button>
+    <button id="playBtn" title="Play/Pause">
+      <svg id="playIcon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+    </button>
+    <button id="nextBtn" title="Next" class="skip">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 6h2v12h-2zM5 6l9 6-9 6z"/></svg>
+    </button>
+  </div>
+
+  <div class="lower-row">
+    <div class="volume">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 10v4h4l5 5V5L7 10H3zm13.5 2A4.5 4.5 0 0 0 15 8.29v7.42A4.48 4.48 0 0 0 16.5 12z"/></svg>
+      <input type="range" id="volume" min="0" max="100" value="80">
+    </div>
+    <button class="icon-toggle" id="autoplayToggle">Autoplay</button>
+  </div>
+
+  <div class="playlist" id="playlist"></div>
+
+  <audio id="audio"></audio>
+</div>
+
+<script>
+  const songs = [
+    {
+      title: "Morning Drive",
+      artist: "SoundHelix",
+      cover: "https://picsum.photos/seed/morningdrive/200/200",
+      src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
+    },
+    {
+      title: "Slow Static",
+      artist: "SoundHelix",
+      cover: "https://picsum.photos/seed/slowstatic/200/200",
+      src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"
+    },
+    {
+      title: "Amber Room",
+      artist: "SoundHelix",
+      cover: "https://picsum.photos/seed/amberroom/200/200",
+      src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"
+    },
+    {
+      title: "Nightwalk",
+      artist: "SoundHelix",
+      cover: "https://picsum.photos/seed/nightwalk/200/200",
+      src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3"
+    }
+  ];
+
+  let currentIndex = 0;
+  let isPlaying = false;
+  let autoplay = false;
+
+  const audio = document.getElementById('audio');
+  const playBtn = document.getElementById('playBtn');
+  const playIcon = document.getElementById('playIcon');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const progress = document.getElementById('progress');
+  const currentTimeEl = document.getElementById('currentTime');
+  const durationEl = document.getElementById('duration');
+  const volumeSlider = document.getElementById('volume');
+  const record = document.getElementById('record');
+  const art = document.getElementById('art');
+  const trackTitle = document.getElementById('trackTitle');
+  const trackArtist = document.getElementById('trackArtist');
+  const playlistEl = document.getElementById('playlist');
+  const autoplayToggle = document.getElementById('autoplayToggle');
+
+  const PLAY_ICON = '<path d="M8 5v14l11-7z"/>';
+  const PAUSE_ICON = '<path d="M6 5h4v14H6zM14 5h4v14h-4z"/>';
+
+  function formatTime(sec){
+    if (isNaN(sec)) return "0:00";
+    const m = Math.floor(sec / 60);
+    const s = Math.floor(sec % 60).toString().padStart(2, "0");
+    return `${m}:${s}`;
+  }
+
+  function renderPlaylist(){
+    playlistEl.innerHTML = "";
+    songs.forEach((song, i) => {
+      const row = document.createElement('div');
+      row.className = 'song' + (i === currentIndex ? ' active' : '');
+      row.innerHTML = `
+        <div class="song-info">
+          <span class="song-name">${song.title}</span>
+          <span class="song-sub">${song.artist}</span>
+        </div>
+        <span class="song-len" data-len="${i}">--:--</span>
+      `;
+      row.addEventListener('click', () => loadSong(i, true));
+      playlistEl.appendChild(row);
+    });
+  }
+
+  function loadSong(index, autoPlay){
+    currentIndex = (index + songs.length) % songs.length;
+    const song = songs[currentIndex];
+    audio.src = song.src;
+    art.src = song.cover;
+    trackTitle.textContent = song.title;
+    trackArtist.textContent = song.artist;
+    renderPlaylist();
+    if (autoPlay) play();
+  }
+
+  function play(){
+    audio.play();
+    isPlaying = true;
+    playIcon.outerHTML = `<svg id="playIcon" viewBox="0 0 24 24" fill="currentColor">${PAUSE_ICON}</svg>`;
+    record.classList.add('spinning');
+  }
+
+  function pause(){
+    audio.pause();
+    isPlaying = false;
+    document.getElementById('playIcon').outerHTML = `<svg id="playIcon" viewBox="0 0 24 24" fill="currentColor">${PLAY_ICON}</svg>`;
+    record.classList.remove('spinning');
+  }
+
+  playBtn.addEventListener('click', () => isPlaying ? pause() : play());
+  prevBtn.addEventListener('click', () => loadSong(currentIndex - 1, isPlaying));
+  nextBtn.addEventListener('click', () => loadSong(currentIndex + 1, isPlaying));
+
+  audio.addEventListener('timeupdate', () => {
+    if (!audio.duration) return;
+    const pct = (audio.currentTime / audio.duration) * 100;
+    progress.value = pct;
+    progress.style.background = `linear-gradient(to right, var(--amber) ${pct}%, var(--bar-track) ${pct}%)`;
+    currentTimeEl.textContent = formatTime(audio.currentTime);
+  });
+
+  audio.addEventListener('loadedmetadata', () => {
+    durationEl.textContent = formatTime(audio.duration);
+    const lenEl = document.querySelector(`[data-len="${currentIndex}"]`);
+    if (lenEl) lenEl.textContent = formatTime(audio.duration);
+  });
+
+  audio.addEventListener('ended', () => {
+    if (autoplay) {
+      loadSong(currentIndex + 1, true);
+    } else {
+      pause();
+      progress.value = 0;
+    }
+  });
+
+  progress.addEventListener('input', () => {
+    if (audio.duration) {
+      audio.currentTime = (progress.value / 100) * audio.duration;
+    }
+  });
+
+  volumeSlider.addEventListener('input', () => {
+    audio.volume = volumeSlider.value / 100;
+  });
+
+  autoplayToggle.addEventListener('click', () => {
+    autoplay = !autoplay;
+    autoplayToggle.classList.toggle('active', autoplay);
+    autoplayToggle.textContent = autoplay ? "Autoplay: On" : "Autoplay";
+  });
+
+  audio.volume = 0.8;
+  loadSong(0, false);
+</script>
+
+</body>
+</html>
