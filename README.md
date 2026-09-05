@@ -2,7 +2,7 @@
 
 A simple, stylish music player built using **HTML, CSS, and JavaScript** as part of Task of my web development internship.
 
-**Live Demo: ** [https://bhoomirawat.github.io/CodeAlpha_Musicplayer/)
+Live Demo: [https://bhoomirawat.github.io/CodeAlpha_Musicplayer/)
 
 ## 🌟 Features
 
