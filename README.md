@@ -30,4 +30,4 @@ Open `index.html` and find the `songs` array inside the `<script>` section, then
 
 ---
 
-Made with 🎧 as part of Task 4 — Music Player using JavaScript.
+Made with 🎧 as part of Task — Music Player using JavaScript.
